@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  private blacklist: string[] = []
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -20,9 +21,19 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+    // console.log("USER =>>", user)
+    const payload = { email: user.email, sub: user.id, "name": user.name };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async logout(token: string) {
+    this.blacklist.push(token); // Blacklist the token (optional)
+    return { message: 'Logged out successfully' };
+  }
+
+  isBlacklisted(token: string): boolean {
+    return this.blacklist.includes(token); // Check if the token is blacklisted
   }
 }
